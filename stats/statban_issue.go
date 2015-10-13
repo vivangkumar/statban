@@ -16,17 +16,19 @@ type StatbanIssue struct {
 	BatchId        string    `gorethink:"batch_id,omniempty" json:"batch_id"`
 }
 
-func NewFromGithubIssue(i *StatbanIssue, ghIssue *github.Issue, batchId string) *StatbanIssue {
-	i.IssueId = *ghIssue.Number
-	i.Title = *ghIssue.Title
-	i.Label = *ghIssue.Labels[0].Name
-	i.Username = *ghIssue.User.Login
-	i.Milestone = getMilestone(ghIssue.Milestone)
-	i.IssueCreatedAt = *ghIssue.CreatedAt
-	i.CreatedAt = time.Now()
-	i.BatchId = batchId
+func NewFromGithubIssue(ghIssue *github.Issue, batchId string) *StatbanIssue {
+	issue := &StatbanIssue{
+		IssueId:        *ghIssue.Number,
+		Title:          *ghIssue.Title,
+		Label:          *ghIssue.Labels[0].Name,
+		Username:       *ghIssue.User.Login,
+		Milestone:      getMilestone(ghIssue.Milestone),
+		IssueCreatedAt: *ghIssue.CreatedAt,
+		CreatedAt:      time.Now(),
+		BatchId:        batchId,
+	}
 
-	return i
+	return issue
 }
 
 func getMilestone(m *github.Milestone) string {

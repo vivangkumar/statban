@@ -34,7 +34,7 @@ func collector(ghConfig *GithubConfig, db *Db) {
 		if len(issues) > 0 {
 			statbanIssues := make([]*StatbanIssue, len(issues))
 			for i, issue := range issues {
-				statbanIssues[i] = NewFromGithubIssue(statbanIssues[i], &issue, batchId.String())
+				statbanIssues[i] = NewFromGithubIssue(&issue, batchId.String())
 			}
 			db.StoreDailyState(statbanIssues)
 		} else {

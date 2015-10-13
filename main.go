@@ -47,7 +47,7 @@ func init() {
 		db.Address = "localhost:28015"
 	}
 
-	if sdb := os.Getenv("STATBAN_DB"); db != "" {
+	if sdb := os.Getenv("STATBAN_DB"); sdb != "" {
 		db.Name = sdb
 	} else {
 		db.Name = "statban"
