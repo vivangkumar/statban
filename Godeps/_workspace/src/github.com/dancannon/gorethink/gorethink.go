@@ -3,9 +3,9 @@ package gorethink
 import (
 	"reflect"
 
-	"github.com/vivangkumar/statban/Godeps/_workspace/src/github.com/Sirupsen/logrus"
+	"github.com/statban/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 
-	"github.com/vivangkumar/statban/Godeps/_workspace/src/github.com/dancannon/gorethink/encoding"
+	"github.com/statban/Godeps/_workspace/src/github.com/dancannon/gorethink/encoding"
 )
 
 var (

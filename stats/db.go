@@ -5,15 +5,15 @@ import (
 	"log"
 )
 
-type DbConfig struct {
-	DbName  string
+type Db struct {
+	Name    string
 	Address string
-	Tables  []string
 	Session *r.Session
 }
 
-func (d *DbConfig) Setup() (*DbConfig, error) {
-	db := d.DbName
+func (d *Db) Setup() (*Db, error) {
+	db := d.Name
+	tables := []string{"hourly_state", "daily_state"}
 
 	rSession, err := r.Connect(r.ConnectOpts{
 		Address:  d.Address,
@@ -24,14 +24,13 @@ func (d *DbConfig) Setup() (*DbConfig, error) {
 	}
 
 	d.Session = rSession
-	log.Printf("Setting up database..")
 
+	log.Printf("Setting up database..")
 	_, err = r.DBCreate(db).Run(rSession)
 	if err != nil {
 		log.Printf("Database already exists. Skipping..")
 	}
-
-	for _, tbl := range d.Tables {
+	for _, tbl := range tables {
 		_, err = r.DB(db).TableCreate(tbl).Run(rSession)
 		if err != nil {
 			log.Printf("Table %v already exists. Skipping..", tbl)
@@ -39,4 +38,13 @@ func (d *DbConfig) Setup() (*DbConfig, error) {
 	}
 
 	return d, nil
+}
+
+func (d *Db) StoreDailyState(issues []*StatbanIssue) {
+	for _, issue := range issues {
+		_, err := r.DB(d.Name).Table("hourly_state").Insert(issue).RunWrite(d.Session)
+		if err != nil {
+			log.Printf("Error inserting issue %v into table", issue)
+		}
+	}
 }

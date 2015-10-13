@@ -1,7 +1,7 @@
 package gorethink
 
 import (
-	p "github.com/vivangkumar/statban/stats/Godeps/_workspace/src/github.com/dancannon/gorethink/ql2"
+	p "github.com/statban/stats/Godeps/_workspace/src/github.com/dancannon/gorethink/ql2"
 )
 
 // DBCreate creates a database. A RethinkDB database is a collection of tables,

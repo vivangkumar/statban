@@ -17,7 +17,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/vivangkumar/statban/Godeps/_workspace/src/golang.org/x/net/context"
+	"github.com/statban/Godeps/_workspace/src/golang.org/x/net/context"
 )
 
 // Token represents the crendentials used to authorize

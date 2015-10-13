@@ -1,9 +1,9 @@
 package stats
 
 import (
-	r "github.com/dancannon/gorethink"
-	"github.com/google/go-github/github"
-	"github.com/nu7hatch/gouuid"
+	r "github.com/statban/Godeps/_workspace/src/github.com/dancannon/gorethink"
+	"github.com/statban/Godeps/_workspace/src/github.com/google/go-github/github"
+	"github.com/statban/Godeps/_workspace/src/github.com/nu7hatch/gouuid"
 	"log"
 	"time"
 )

@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/vivangkumar/statban/Godeps/_workspace/src/github.com/dancannon/gorethink/encoding"
-	p "github.com/vivangkumar/statban/Godeps/_workspace/src/github.com/dancannon/gorethink/ql2"
+	"github.com/statban/Godeps/_workspace/src/github.com/dancannon/gorethink/encoding"
+	p "github.com/statban/Godeps/_workspace/src/github.com/dancannon/gorethink/ql2"
 )
 
 var (
