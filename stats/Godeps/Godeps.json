@@ -1,6 +1,6 @@
 {
-	"ImportPath": "github.com/vivangkumar/statban/stats",
-	"GoVersion": "go1.5.1",
+	"ImportPath": "github.com/statban/stats",
+	"GoVersion": "go1.4",
 	"Deps": [
 		{
 			"ImportPath": "github.com/Sirupsen/logrus",
@@ -29,12 +29,8 @@
 			"Rev": "547ef5ac979778feb2f760cdb5f4eae1a2207b86"
 		},
 		{
-			"ImportPath": "golang.org/x/net/context",
-			"Rev": "db8e4de5b2d6653f66aea53094624468caad15d2"
-		},
-		{
-			"ImportPath": "golang.org/x/oauth2",
-			"Rev": "2fbf3d7329d847b125188ad64b68cfb1f548938a"
+			"ImportPath": "github.com/nu7hatch/gouuid",
+			"Rev": "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 		}
 	]
 }

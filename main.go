@@ -14,7 +14,7 @@ type Config struct {
 	HttpAddress  string
 	Env          string
 	GithubClient *github.Client
-	DbConfig     *s.DbConfig
+	Db           *s.Db
 }
 
 var (
@@ -25,7 +25,7 @@ var (
 func init() {
 	c := Config{}
 	ghConfig := s.GithubConfig{}
-	dbConfig := s.DbConfig{}
+	db := s.Db{}
 
 	if addr := os.Getenv("HTTP_ADDR"); addr != "" {
 		c.HttpAddress = addr
@@ -42,19 +42,17 @@ func init() {
 	}
 
 	if rdb := os.Getenv("RETHINK_DB_ADDR"); rdb != "" {
-		dbConfig.Address = rdb
+		db.Address = rdb
 	} else {
-		dbConfig.Address = "localhost:28015"
+		db.Address = "localhost:28015"
 	}
 
-	dbConfig.Tables = []string{"hourly_state", "daily_state"}
-
-	if db := os.Getenv("STATBAN_DB"); db != "" {
-		dbConfig.DbName = db
+	if sdb := os.Getenv("STATBAN_DB"); db != "" {
+		db.Name = sdb
 	} else {
-		dbConfig.DbName = "statban"
+		db.Name = "statban"
 	}
-	c.DbConfig = &dbConfig
+	c.Db = &db
 	StatbanConfig = &c
 
 	if at := os.Getenv("GITHUB_TOKEN"); at != "" {
@@ -85,7 +83,7 @@ func init() {
 }
 
 func main() {
-	cfg, err := StatbanConfig.DbConfig.Setup()
+	cfg, err := StatbanConfig.Db.Setup()
 	if err != nil {
 		panic(err.Error())
 	}

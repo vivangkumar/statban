@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/vivangkumar/statban/stats/Godeps/_workspace/src/github.com/dancannon/gorethink/types"
+	"github.com/statban/stats/Godeps/_workspace/src/github.com/dancannon/gorethink/types"
 
 	"fmt"
 )

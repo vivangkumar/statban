@@ -1,0 +1,40 @@
+{
+	"ImportPath": "github.com/vivangkumar/statban/stats",
+	"GoVersion": "go1.5.1",
+	"Deps": [
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.8.7-28-gdf78bc7",
+			"Rev": "df78bc75a33fd9b582230e052be33dff861f3a4a"
+		},
+		{
+			"ImportPath": "github.com/cenkalti/backoff",
+			"Rev": "4dc77674aceaabba2c7e3da25d4c823edfb73f99"
+		},
+		{
+			"ImportPath": "github.com/dancannon/gorethink",
+			"Comment": "v1.1.4",
+			"Rev": "6468f77f2e54184f2ff8fec0006c008ac9eca496"
+		},
+		{
+			"ImportPath": "github.com/golang/protobuf/proto",
+			"Rev": "deb4a5e3b15dea23f340a311eea995421845c356"
+		},
+		{
+			"ImportPath": "github.com/google/go-github/github",
+			"Rev": "2570a87f54b43ed0957cabd7a0819f0dab85217b"
+		},
+		{
+			"ImportPath": "github.com/google/go-querystring/query",
+			"Rev": "547ef5ac979778feb2f760cdb5f4eae1a2207b86"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "db8e4de5b2d6653f66aea53094624468caad15d2"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "2fbf3d7329d847b125188ad64b68cfb1f548938a"
+		}
+	]
+}

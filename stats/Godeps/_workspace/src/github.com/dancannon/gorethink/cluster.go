@@ -8,8 +8,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/vivangkumar/statban/stats/Godeps/_workspace/src/github.com/Sirupsen/logrus"
-	"github.com/vivangkumar/statban/stats/Godeps/_workspace/src/github.com/cenkalti/backoff"
+	"github.com/statban/stats/Godeps/_workspace/src/github.com/Sirupsen/logrus"
+	"github.com/statban/stats/Godeps/_workspace/src/github.com/cenkalti/backoff"
 )
 
 // A Cluster represents a connection to a RethinkDB cluster, a cluster is created

@@ -18,10 +18,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/vivangkumar/statban/Godeps/_workspace/src/golang.org/x/net/context"
-	"github.com/vivangkumar/statban/Godeps/_workspace/src/golang.org/x/oauth2"
-	"github.com/vivangkumar/statban/Godeps/_workspace/src/golang.org/x/oauth2/internal"
-	"github.com/vivangkumar/statban/Godeps/_workspace/src/golang.org/x/oauth2/jws"
+	"github.com/statban/Godeps/_workspace/src/golang.org/x/net/context"
+	"github.com/statban/Godeps/_workspace/src/golang.org/x/oauth2"
+	"github.com/statban/Godeps/_workspace/src/golang.org/x/oauth2/internal"
+	"github.com/statban/Godeps/_workspace/src/golang.org/x/oauth2/jws"
 )
 
 var (

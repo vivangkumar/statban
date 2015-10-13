@@ -1,7 +1,7 @@
 package gorethink
 
 import (
-	p "github.com/vivangkumar/statban/Godeps/_workspace/src/github.com/dancannon/gorethink/ql2"
+	p "github.com/statban/Godeps/_workspace/src/github.com/dancannon/gorethink/ql2"
 )
 
 // InnerJoin returns the inner product of two sequences (e.g. a table, a filter result)
