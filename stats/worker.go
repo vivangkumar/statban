@@ -19,6 +19,7 @@ func collector(ghConfig *GithubConfig, db *Db) {
 	log.Printf("Getting issues for %v", ghConfig.TargetRepo)
 
 	batchId, _ := uuid.NewV4()
+	batchIdS := batchId.String()
 	for _, lbl := range ghConfig.Labels {
 		log.Printf("Getting issues with label %v", lbl)
 
@@ -34,13 +35,15 @@ func collector(ghConfig *GithubConfig, db *Db) {
 		if len(issues) > 0 {
 			statbanIssues := make([]*StatbanIssue, len(issues))
 			for i, issue := range issues {
-				statbanIssues[i] = NewFromGithubIssue(&issue, batchId.String())
+				statbanIssues[i] = NewFromGithubIssue(&issue, batchIdS)
 			}
 			db.StoreHourlyState(statbanIssues)
 		} else {
 			log.Printf("No issues for label %v", lbl)
 		}
 	}
+
+	db.SummarizeByBatch(batchIdS)
 }
 
 func RunCollector(db *Db, ghConfig *GithubConfig) {
