@@ -19,7 +19,7 @@ type SummarizedGroup struct {
 
 type SummarizedBatch struct {
 	BatchId   string             `gorethink:"batch_id,omitempty" json:"batch_id"`
-	States    []*SummarizedState `gorethink:"states",omitempty json:"states"`
+	States    *[]SummarizedState `gorethink:"states",omitempty json:"states"`
 	CreatedAt time.Time          `gorethink:"created_at" json:"created_at"`
 }
 
@@ -66,9 +66,11 @@ func (d *Db) StoreHourlyState(issues []*StatbanIssue) {
 	}
 }
 
-// TODO link to issues and account for missing states
-func (d *Db) SummarizeByBatch(batchId string) {
-	cur, err := r.DB(d.Name).Table("hourly_state").Group("label").Count().Run(d.Session)
+func (d *Db) SummarizeByBatch(batchId string, ghConfig *GithubConfig) {
+	log.Print("Summarizing for batch id: %v", batchId)
+	cur, err := r.DB(d.Name).Table("hourly_state").
+		Filter(map[string]string{"batch_id": batchId}).
+		Group("label").Count().Run(d.Session)
 	if err != nil {
 		log.Printf("Error when grouping data: %v", err.Error())
 		return
@@ -86,16 +88,18 @@ func (d *Db) SummarizeByBatch(batchId string) {
 		CreatedAt: time.Now(),
 	}
 
-	st := make([]*SummarizedState, len(res))
+	labels := ghConfig.Labels
+	ss := make([]SummarizedState, len(labels))
 	for i, sg := range res {
-		st[i] = &SummarizedState{
-			Label: sg.Group,
-			Count: sg.Reduction,
-		}
+		ss[i] = NewSummarizedState(sg.Group, sg.Reduction)
 	}
+	sumBatch.States = &ss
 
-	sumBatch.States = st
 	d.writeSummaries(sumBatch)
+}
+
+func NewSummarizedState(label string, count int) SummarizedState {
+	return SummarizedState{Label: label, Count: count}
 }
 
 func (d *Db) writeSummaries(summary *SummarizedBatch) {

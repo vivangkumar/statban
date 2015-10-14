@@ -17,7 +17,7 @@ type StatbanIssue struct {
 }
 
 func NewFromGithubIssue(ghIssue *github.Issue, batchId string) *StatbanIssue {
-	issue := &StatbanIssue{
+	return &StatbanIssue{
 		IssueId:        *ghIssue.Number,
 		Title:          *ghIssue.Title,
 		Label:          *ghIssue.Labels[0].Name,
@@ -27,8 +27,6 @@ func NewFromGithubIssue(ghIssue *github.Issue, batchId string) *StatbanIssue {
 		CreatedAt:      time.Now(),
 		BatchId:        batchId,
 	}
-
-	return issue
 }
 
 func getMilestone(m *github.Milestone) string {
