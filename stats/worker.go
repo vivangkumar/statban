@@ -36,7 +36,7 @@ func collector(ghConfig *GithubConfig, db *Db) {
 			for i, issue := range issues {
 				statbanIssues[i] = NewFromGithubIssue(&issue, batchId.String())
 			}
-			db.StoreDailyState(statbanIssues)
+			db.StoreHourlyState(statbanIssues)
 		} else {
 			log.Printf("No issues for label %v", lbl)
 		}

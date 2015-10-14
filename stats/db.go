@@ -40,7 +40,7 @@ func (d *Db) Setup() (*Db, error) {
 	return d, nil
 }
 
-func (d *Db) StoreDailyState(issues []*StatbanIssue) {
+func (d *Db) StoreHourlyState(issues []*StatbanIssue) {
 	for _, issue := range issues {
 		_, err := r.DB(d.Name).Table("hourly_state").Insert(issue).RunWrite(d.Session)
 		if err != nil {
