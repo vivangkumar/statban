@@ -67,7 +67,7 @@ func (d *Db) StoreHourlyState(issues []*StatbanIssue) {
 }
 
 func (d *Db) SummarizeByBatch(batchId string, ghConfig *GithubConfig) {
-	log.Print("Summarizing for batch id: %v", batchId)
+	log.Printf("Summarizing for batch id: %v", batchId)
 	cur, err := r.DB(d.Name).Table("hourly_state").
 		Filter(map[string]string{"batch_id": batchId}).
 		Group("label").Count().Run(d.Session)
