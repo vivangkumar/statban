@@ -16,7 +16,27 @@ type StatbanIssue struct {
 	BatchId        string    `gorethink:"batch_id,omniempty" json:"batch_id"`
 }
 
-func NewFromGithubIssue(ghIssue *github.Issue, batchId string) *StatbanIssue {
+type SummarizedGroup struct {
+	Group     string
+	Reduction int
+}
+
+type SummarizedBatch struct {
+	BatchId   string             `gorethink:"batch_id,omitempty" json:"batch_id"`
+	States    *[]SummarizedState `gorethink:"states",omitempty json:"states"`
+	CreatedAt time.Time          `gorethink:"created_at" json:"created_at"`
+}
+
+type SummarizedState struct {
+	Label string `gorethink:"label,omitempty" json:"label"`
+	Count int    `gorethink:"count",omitempty" json:"count" `
+}
+
+func NewSummarizedState(label string, count int) SummarizedState {
+	return SummarizedState{Label: label, Count: count}
+}
+
+func NewFromStatbanIssueFromGithubIssue(ghIssue *github.Issue, batchId string) *StatbanIssue {
 	return &StatbanIssue{
 		IssueId:        *ghIssue.Number,
 		Title:          *ghIssue.Title,
@@ -26,13 +46,5 @@ func NewFromGithubIssue(ghIssue *github.Issue, batchId string) *StatbanIssue {
 		IssueCreatedAt: *ghIssue.CreatedAt,
 		CreatedAt:      time.Now(),
 		BatchId:        batchId,
-	}
-}
-
-func getMilestone(m *github.Milestone) string {
-	if m == nil {
-		return ""
-	} else {
-		return *m.Title
 	}
 }

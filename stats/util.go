@@ -1,5 +1,7 @@
 package stats
 
+import "github.com/google/go-github/github"
+
 func arrayDifference(slice1, slice2 []string) (diff []string) {
 	for i := 0; i < 2; i++ {
 		for _, s1 := range slice1 {
@@ -20,4 +22,20 @@ func arrayDifference(slice1, slice2 []string) (diff []string) {
 	}
 
 	return
+}
+
+func addMissingLabels(missing []string, ss *[]SummarizedState) *[]SummarizedState {
+	for _, l := range missing {
+		*ss = append(*ss, NewSummarizedState(l, 0))
+	}
+
+	return ss
+}
+
+func getMilestone(m *github.Milestone) string {
+	if m == nil {
+		return ""
+	} else {
+		return *m.Title
+	}
 }
