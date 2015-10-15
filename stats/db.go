@@ -68,6 +68,7 @@ func (d *Db) StoreHourlyState(issues []*StatbanIssue) {
 
 func (d *Db) SummarizeByBatch(batchId string, ghConfig *GithubConfig) {
 	log.Printf("Summarizing for batch id: %v", batchId)
+
 	cur, err := r.DB(d.Name).Table("hourly_state").
 		Filter(map[string]string{"batch_id": batchId}).
 		Group("label").Count().Run(d.Session)
@@ -89,10 +90,16 @@ func (d *Db) SummarizeByBatch(batchId string, ghConfig *GithubConfig) {
 	}
 
 	labels := ghConfig.Labels
-	ss := make([]SummarizedState, len(labels))
+	var addedLabels []string
+
+	ss := make([]SummarizedState, len(res))
 	for i, sg := range res {
+		addedLabels = append(addedLabels, sg.Group)
 		ss[i] = NewSummarizedState(sg.Group, sg.Reduction)
 	}
+
+	missingLabels := arrayDifference(addedLabels, labels)
+	addMissingLabels(missingLabels, &ss)
 	sumBatch.States = &ss
 
 	d.writeSummaries(sumBatch)
@@ -107,4 +114,12 @@ func (d *Db) writeSummaries(summary *SummarizedBatch) {
 	if err != nil {
 		log.Printf("Error inserting summary %v into table", summary)
 	}
+}
+
+func addMissingLabels(missing []string, ss *[]SummarizedState) *[]SummarizedState {
+	for _, l := range missing {
+		*ss = append(*ss, NewSummarizedState(l, 0))
+	}
+
+	return ss
 }
