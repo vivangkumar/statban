@@ -89,6 +89,26 @@ func (d *Db) SummarizeByBatch(batchId string, ghConfig *GithubConfig) {
 	d.writeSummaries(sumBatch)
 }
 
+func (d *Db) SummarizeByDay() {
+	beginning := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.UTC)
+	end := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day()+1, 0, 0, 0, 0, time.UTC)
+	log.Printf("Summarizing by day between %v and %v", beginning, end)
+
+	cur, err := r.DB(d.Name).Table("hourly_summary").Filter(r.Row.Field("created_at").
+		During(beginning, end)).Run(d.Session)
+	if err != nil {
+		log.Printf("Error getting day summary %v", err.Error())
+	}
+
+	var res []SummarizedBatch
+	err = cur.All(&res)
+	if err != nil {
+		log.Printf("Error when summarizing by day: %v", err.Error())
+	}
+
+	log.Printf("%v", res)
+}
+
 func (d *Db) writeSummaries(summary *SummarizedBatch) {
 	_, err := r.DB(d.Name).Table("hourly_summary").Insert(*summary).RunWrite(d.Session)
 	if err != nil {

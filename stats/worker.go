@@ -43,7 +43,7 @@ func collector(ghConfig *GithubConfig, db *Db) {
 		}
 	}
 
-	db.SummarizeByBatch(batchIdStr, ghConfig)
+	go db.SummarizeByBatch(batchIdStr, ghConfig)
 }
 
 func RunCollector(db *Db, ghConfig *GithubConfig) {
