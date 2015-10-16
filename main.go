@@ -35,10 +35,12 @@ func init() {
 
 	if env := os.Getenv("ENVIRONMENT"); env != "" {
 		c.Env = env
-		ghConfig.PollInterval = 86400
+		ghConfig.PollInterval = 3600
+		ghConfig.DailyInterval = 86400
 	} else {
 		c.Env = "development"
 		ghConfig.PollInterval = 10
+		ghConfig.DailyInterval = 20
 	}
 
 	if rdb := os.Getenv("RETHINK_DB_ADDR"); rdb != "" {
