@@ -92,10 +92,9 @@ func main() {
 
 	go s.RunCollector(cfg, GithubConfig)
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Statban Server"))
-	})
+	http.HandleFunc("/", rootHandler)
+	http.HandleFunc("/hourly", hourlyHandler)
+	http.HandleFunc("/daily", dailyHandler)
 
 	log.Printf("Statban server running on %v", StatbanConfig.HttpAddress)
 	http.ListenAndServe(StatbanConfig.HttpAddress, nil)
