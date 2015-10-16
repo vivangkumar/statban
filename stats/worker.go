@@ -8,11 +8,12 @@ import (
 )
 
 type GithubConfig struct {
-	Client       *github.Client
-	TargetRepo   string
-	Owner        string
-	Labels       []string
-	PollInterval int
+	Client        *github.Client
+	TargetRepo    string
+	Owner         string
+	Labels        []string
+	PollInterval  int
+	DailyInterval int
 }
 
 func collector(ghConfig *GithubConfig, db *Db) {
@@ -49,7 +50,7 @@ func collector(ghConfig *GithubConfig, db *Db) {
 func RunCollector(db *Db, ghConfig *GithubConfig) {
 	log.Print("Running stats collector..")
 	intervalTicker := time.NewTicker(time.Duration(ghConfig.PollInterval) * time.Second)
-	dayTicker := time.NewTicker(20 * time.Second)
+	dayTicker := time.NewTicker(time.Duration(ghConfig.DailyInterval) * time.Second)
 
 	// TODO: This will leak memory, if the ticker is never closed
 	// Maybe write a ticker manager which spawns new tickers?

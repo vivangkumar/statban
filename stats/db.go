@@ -32,6 +32,7 @@ func (d *Db) Setup() (*Db, error) {
 		log.Printf("Database already exists. Skipping..")
 	}
 	for _, tbl := range tables {
+		log.Printf("Creating table %v", tbl)
 		_, err = r.DB(db).TableCreate(tbl).Run(rSession)
 		if err != nil {
 			log.Printf("Table %v already exists. Skipping..", tbl)
@@ -111,7 +112,8 @@ func (d *Db) SummarizeByDay() {
 		return
 	}
 
-	d.writeDaySummary(res[len(res)-1])
+	sb := &res[len(res)-1]
+	d.writeDaySummary(NewSummarizedDay(sb, beginning, end))
 	return
 }
 
@@ -124,7 +126,7 @@ func (d *Db) writeBatchSummary(summary *SummarizedBatch) {
 	return
 }
 
-func (d *Db) writeDaySummary(ds SummarizedBatch) {
+func (d *Db) writeDaySummary(ds *SummarizedDay) {
 	_, err := r.DB(d.Name).Table("daily_summary").Insert(ds).RunWrite(d.Session)
 	if err != nil {
 		log.Printf("Error inserting day summary %v into table: %v", ds, err.Error())

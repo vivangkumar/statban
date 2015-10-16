@@ -32,8 +32,22 @@ type SummarizedState struct {
 	Count int    `gorethink:"count",omitempty" json:"count" `
 }
 
+type SummarizedDay struct {
+	*SummarizedBatch
+	Begining time.Time `gorethink:"begining" json:"begining"`
+	End      time.Time `gorethink:"end" json:"end"`
+}
+
 func NewSummarizedState(label string, count int) SummarizedState {
 	return SummarizedState{Label: label, Count: count}
+}
+
+func NewSummarizedDay(sb *SummarizedBatch, beg time.Time, end time.Time) *SummarizedDay {
+	return &SummarizedDay{
+		SummarizedBatch: sb,
+		Begining:        beg,
+		End:             end,
+	}
 }
 
 func NewFromStatbanIssueFromGithubIssue(ghIssue *github.Issue, batchId string) *StatbanIssue {
