@@ -14,7 +14,7 @@ type Db struct {
 
 func (d *Db) Setup() (*Db, error) {
 	db := d.Name
-	tables := []string{"hourly_state", "daily_state", "hourly_summary"}
+	tables := []string{"hourly_state", "daily_summary", "hourly_summary"}
 
 	rSession, err := r.Connect(r.ConnectOpts{
 		Address:  d.Address,
@@ -60,6 +60,7 @@ func (d *Db) SummarizeByBatch(batchId string, ghConfig *GithubConfig) {
 		log.Printf("Error when grouping data: %v", err.Error())
 		return
 	}
+	defer cur.Close()
 
 	var res []SummarizedGroup
 	err = cur.All(&res)
@@ -86,7 +87,8 @@ func (d *Db) SummarizeByBatch(batchId string, ghConfig *GithubConfig) {
 	addMissingLabels(missingLabels, &ss)
 	sumBatch.States = &ss
 
-	d.writeSummaries(sumBatch)
+	d.writeBatchSummary(sumBatch)
+	return
 }
 
 func (d *Db) SummarizeByDay() {
@@ -98,20 +100,35 @@ func (d *Db) SummarizeByDay() {
 		During(beginning, end)).Run(d.Session)
 	if err != nil {
 		log.Printf("Error getting day summary %v", err.Error())
+		return
 	}
+	defer cur.Close()
 
 	var res []SummarizedBatch
 	err = cur.All(&res)
 	if err != nil {
 		log.Printf("Error when summarizing by day: %v", err.Error())
+		return
 	}
 
-	log.Printf("%v", res)
+	d.writeDaySummary(res[len(res)-1])
+	return
 }
 
-func (d *Db) writeSummaries(summary *SummarizedBatch) {
+func (d *Db) writeBatchSummary(summary *SummarizedBatch) {
 	_, err := r.DB(d.Name).Table("hourly_summary").Insert(*summary).RunWrite(d.Session)
 	if err != nil {
-		log.Printf("Error inserting summary %v into table", summary)
+		log.Printf("Error inserting summary %v into table: %v", summary, err.Error())
+		return
 	}
+	return
+}
+
+func (d *Db) writeDaySummary(ds SummarizedBatch) {
+	_, err := r.DB(d.Name).Table("daily_summary").Insert(ds).RunWrite(d.Session)
+	if err != nil {
+		log.Printf("Error inserting day summary %v into table: %v", ds, err.Error())
+		return
+	}
+	return
 }

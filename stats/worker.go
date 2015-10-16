@@ -48,12 +48,17 @@ func collector(ghConfig *GithubConfig, db *Db) {
 
 func RunCollector(db *Db, ghConfig *GithubConfig) {
 	log.Print("Running stats collector..")
-	ticker := time.NewTicker(time.Duration(ghConfig.PollInterval) * time.Second)
+	intervalTicker := time.NewTicker(time.Duration(ghConfig.PollInterval) * time.Second)
+	dayTicker := time.NewTicker(20 * time.Second)
 
+	// TODO: This will leak memory, if the ticker is never closed
+	// Maybe write a ticker manager which spawns new tickers?
 	for {
 		select {
-		case <-ticker.C:
+		case <-intervalTicker.C:
 			collector(ghConfig, db)
+		case <-dayTicker.C:
+			go db.SummarizeByDay()
 		}
 	}
 }
