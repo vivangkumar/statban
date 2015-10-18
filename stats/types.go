@@ -23,7 +23,7 @@ type SummarizedGroup struct {
 
 type SummarizedBatch struct {
 	BatchId   string             `gorethink:"batch_id,omitempty" json:"batch_id"`
-	States    *[]SummarizedState `gorethink:"states",omitempty json:"states"`
+	States    *[]SummarizedState `gorethink:"states,omitempty" json:"states"`
 	CreatedAt time.Time          `gorethink:"created_at" json:"created_at"`
 }
 
@@ -34,8 +34,8 @@ type SummarizedState struct {
 
 type SummarizedDay struct {
 	*SummarizedBatch
-	Begining time.Time `gorethink:"begining" json:"begining"`
-	End      time.Time `gorethink:"end" json:"end"`
+	Beginning time.Time `gorethink:"beginning" json:"begining"`
+	End       time.Time `gorethink:"end" json:"end"`
 }
 
 func NewSummarizedState(label string, count int) SummarizedState {
@@ -45,7 +45,7 @@ func NewSummarizedState(label string, count int) SummarizedState {
 func NewSummarizedDay(sb *SummarizedBatch, beg time.Time, end time.Time) *SummarizedDay {
 	return &SummarizedDay{
 		SummarizedBatch: sb,
-		Begining:        beg,
+		Beginning:       beg,
 		End:             end,
 	}
 }
