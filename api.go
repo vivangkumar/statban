@@ -12,10 +12,10 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Statban Server"))
 }
 
-func batchHandler(w http.ResponseWriter, req *http.Request) {
-	res, err := StatbanConfig.Db.GetBatchStats()
+func hourlyHandler(w http.ResponseWriter, req *http.Request) {
+	res, err := StatbanConfig.Db.GetHourlyStats()
 	if err != nil {
-		internalError(w, "Error when reading batch stats", err)
+		internalError(w, "Error when reading hourly stats", err)
 		return
 	}
 

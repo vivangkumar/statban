@@ -2,7 +2,6 @@ package stats
 
 import (
 	"github.com/google/go-github/github"
-	"github.com/nu7hatch/gouuid"
 	"log"
 	"time"
 )
@@ -19,8 +18,6 @@ type GithubConfig struct {
 func collector(ghConfig *GithubConfig, db *Db) {
 	log.Printf("Getting issues for %v", ghConfig.TargetRepo)
 
-	batchId, _ := uuid.NewV4()
-	batchIdStr := batchId.String()
 	for _, lbl := range ghConfig.Labels {
 		log.Printf("Getting issues with label %v", lbl)
 
@@ -36,7 +33,7 @@ func collector(ghConfig *GithubConfig, db *Db) {
 		if len(issues) > 0 {
 			statbanIssues := make([]*StatbanIssue, len(issues))
 			for i, issue := range issues {
-				statbanIssues[i] = NewFromStatbanIssueFromGithubIssue(&issue, batchIdStr)
+				statbanIssues[i] = NewStatbanIssueFromGithubIssue(&issue)
 			}
 			db.StoreHourlyState(statbanIssues)
 		} else {
@@ -44,7 +41,7 @@ func collector(ghConfig *GithubConfig, db *Db) {
 		}
 	}
 
-	go db.SummarizeByBatch(batchIdStr, ghConfig)
+	go db.SummarizeByHour(ghConfig)
 }
 
 func RunCollector(db *Db, ghConfig *GithubConfig) {

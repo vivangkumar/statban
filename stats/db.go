@@ -15,11 +15,18 @@ type Db struct {
 var (
 	today    time.Time
 	tomorrow time.Time
+	thisHour time.Time
+	nextHour time.Time
 )
 
 func init() {
-	today = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.UTC)
-	tomorrow = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day()+1, 0, 0, 0, 0, time.UTC)
+	now := time.Now().UTC()
+	year, month, day := now.Year(), now.Month(), now.Day()
+
+	today = time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+	tomorrow = today.Add(time.Duration(24) * time.Hour)
+	thisHour = time.Date(year, month, day, now.Hour(), 0, 0, 0, time.UTC)
+	nextHour = thisHour.Add(time.Duration(1) * time.Hour)
 }
 
 func (d *Db) Setup() (*Db, error) {
@@ -61,12 +68,11 @@ func (d *Db) StoreHourlyState(issues []*StatbanIssue) {
 	}
 }
 
-func (d *Db) SummarizeByBatch(batchId string, ghConfig *GithubConfig) {
-	log.Printf("Summarizing for batch id: %v", batchId)
+func (d *Db) SummarizeByHour(ghConfig *GithubConfig) {
+	log.Printf("Summarizing by hour between %v and %v", thisHour, nextHour)
 
-	cur, err := r.DB(d.Name).Table("hourly_state").
-		Filter(map[string]string{"batch_id": batchId}).
-		Group("label").Count().Run(d.Session)
+	cur, err := r.DB(d.Name).Table("hourly_state").Filter(r.Row.Field("created_at").
+		During(thisHour, nextHour)).Group("label").Count().Run(d.Session)
 	if err != nil {
 		log.Printf("Error when grouping data: %v", err.Error())
 		return
@@ -80,8 +86,9 @@ func (d *Db) SummarizeByBatch(batchId string, ghConfig *GithubConfig) {
 		return
 	}
 
-	sumBatch := &SummarizedBatch{
-		BatchId:   batchId,
+	sumBatch := &SummarizedHour{
+		HourStart: thisHour,
+		HourEnd:   nextHour,
 		CreatedAt: time.Now(),
 	}
 
@@ -98,7 +105,7 @@ func (d *Db) SummarizeByBatch(batchId string, ghConfig *GithubConfig) {
 	addMissingLabels(missingLabels, &ss)
 	sumBatch.States = &ss
 
-	d.writeBatchSummary(sumBatch)
+	d.writeHourlySummary(sumBatch)
 	return
 }
 
@@ -113,7 +120,7 @@ func (d *Db) SummarizeByDay() {
 	}
 	defer cur.Close()
 
-	var res []SummarizedBatch
+	var res []SummarizedHour
 	err = cur.All(&res)
 	if err != nil {
 		log.Printf("Error when summarizing by day: %v", err.Error())
@@ -121,7 +128,7 @@ func (d *Db) SummarizeByDay() {
 	}
 
 	sb := &res[len(res)-1]
-	d.writeDaySummary(NewSummarizedDay(sb, today, tomorrow))
+	d.writeDailySummary(NewSummarizedDay(sb, today, tomorrow))
 	return
 }
 
@@ -143,7 +150,7 @@ func (d *Db) GetDailyStats() (res []SummarizedDay, err error) {
 	return res, nil
 }
 
-func (d *Db) GetBatchStats() (res []SummarizedBatch, err error) {
+func (d *Db) GetHourlyStats() (res []SummarizedHour, err error) {
 	cur, err := r.DB(d.Name).Table("hourly_summary").Filter(r.Row.Field("created_at").
 		During(today, tomorrow)).Run(d.Session)
 	if err != nil {
@@ -161,7 +168,7 @@ func (d *Db) GetBatchStats() (res []SummarizedBatch, err error) {
 	return res, nil
 }
 
-func (d *Db) writeBatchSummary(summary *SummarizedBatch) {
+func (d *Db) writeHourlySummary(summary *SummarizedHour) {
 	_, err := r.DB(d.Name).Table("hourly_summary").Insert(*summary).RunWrite(d.Session)
 	if err != nil {
 		log.Printf("Error inserting summary %v into table: %v", summary, err.Error())
@@ -170,7 +177,7 @@ func (d *Db) writeBatchSummary(summary *SummarizedBatch) {
 	return
 }
 
-func (d *Db) writeDaySummary(ds *SummarizedDay) {
+func (d *Db) writeDailySummary(ds *SummarizedDay) {
 	_, err := r.DB(d.Name).Table("daily_summary").Insert(ds).RunWrite(d.Session)
 	if err != nil {
 		log.Printf("Error inserting day summary %v into table: %v", ds, err.Error())
