@@ -3,8 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	r "github.com/dancannon/gorethink"
-	s "github.com/vivangkumar/statban/stats"
 	"log"
 	"net/http"
 	"time"
@@ -27,20 +25,9 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 
 func batchHandler(w http.ResponseWriter, req *http.Request) {
 	db := StatbanConfig.Db
-	cur, err := r.DB(db.Name).Table("hourly_summary").Filter(r.Row.Field("created_at").
-		During(today, tomorrow)).Run(db.Session)
+	res, err := db.GetBatchStats()
 	if err != nil {
-		log.Printf("Error reading batch summary: %v", err.Error())
-		internalError(w, "Read error", err)
-		return
-	}
-	defer cur.Close()
-
-	var res []s.SummarizedBatch
-	err = cur.All(&res)
-	if err != nil {
-		log.Printf("Error when decoding into struct: %v", err.Error())
-		internalError(w, "Decoding error", err)
+		internalError(w, "Error when reading batch stats", err)
 		return
 	}
 
@@ -51,20 +38,9 @@ func batchHandler(w http.ResponseWriter, req *http.Request) {
 
 func dailyHandler(w http.ResponseWriter, req *http.Request) {
 	db := StatbanConfig.Db
-	cur, err := r.DB(db.Name).Table("daily_summary").Filter(r.Row.Field("beginning").
-		Eq(today)).Run(db.Session)
+	res, err := db.GetDailyStats()
 	if err != nil {
-		log.Printf("Error reading day summary: %v", err.Error())
-		internalError(w, "Read error", err)
-		return
-	}
-	defer cur.Close()
-
-	var res []s.SummarizedDay
-	err = cur.All(&res)
-	if err != nil {
-		log.Printf("Error when decoding into struct: %v", err.Error())
-		internalError(w, "Decoding error", err)
+		internalError(w, "Error when reading daily stats", err)
 		return
 	}
 

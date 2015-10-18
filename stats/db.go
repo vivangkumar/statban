@@ -12,6 +12,16 @@ type Db struct {
 	Session *r.Session
 }
 
+var (
+	today    time.Time
+	tomorrow time.Time
+)
+
+func init() {
+	today = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.UTC)
+	tomorrow = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day()+1, 0, 0, 0, 0, time.UTC)
+}
+
 func (d *Db) Setup() (*Db, error) {
 	db := d.Name
 	tables := []string{"hourly_state", "daily_summary", "hourly_summary"}
@@ -93,12 +103,10 @@ func (d *Db) SummarizeByBatch(batchId string, ghConfig *GithubConfig) {
 }
 
 func (d *Db) SummarizeByDay() {
-	beginning := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.UTC)
-	end := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day()+1, 0, 0, 0, 0, time.UTC)
-	log.Printf("Summarizing by day between %v and %v", beginning, end)
+	log.Printf("Summarizing by day between %v and %v", today, tomorrow)
 
 	cur, err := r.DB(d.Name).Table("hourly_summary").Filter(r.Row.Field("created_at").
-		During(beginning, end)).Run(d.Session)
+		During(today, tomorrow)).Run(d.Session)
 	if err != nil {
 		log.Printf("Error getting day summary %v", err.Error())
 		return
@@ -113,8 +121,44 @@ func (d *Db) SummarizeByDay() {
 	}
 
 	sb := &res[len(res)-1]
-	d.writeDaySummary(NewSummarizedDay(sb, beginning, end))
+	d.writeDaySummary(NewSummarizedDay(sb, today, tomorrow))
 	return
+}
+
+func (d *Db) GetDailyStats() (res []SummarizedDay, err error) {
+	cur, err := r.DB(d.Name).Table("daily_summary").Filter(r.Row.Field("beginning").
+		Eq(today)).Run(d.Session)
+	if err != nil {
+		log.Printf("Error reading day summary: %v", err.Error())
+		return nil, err
+	}
+	defer cur.Close()
+
+	err = cur.All(&res)
+	if err != nil {
+		log.Printf("Error when decoding into struct: %v", err.Error())
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (d *Db) GetBatchStats() (res []SummarizedBatch, err error) {
+	cur, err := r.DB(d.Name).Table("hourly_summary").Filter(r.Row.Field("created_at").
+		During(today, tomorrow)).Run(d.Session)
+	if err != nil {
+		log.Printf("Error reading batch summary: %v", err.Error())
+		return nil, err
+	}
+	defer cur.Close()
+
+	err = cur.All(&res)
+	if err != nil {
+		log.Printf("Error when decoding into struct: %v", err.Error())
+		return nil, err
+	}
+
+	return res, nil
 }
 
 func (d *Db) writeBatchSummary(summary *SummarizedBatch) {
