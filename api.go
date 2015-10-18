@@ -5,18 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 )
-
-var (
-	today    time.Time
-	tomorrow time.Time
-)
-
-func init() {
-	today = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.UTC)
-	tomorrow = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day()+1, 0, 0, 0, 0, time.UTC)
-}
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
@@ -24,26 +13,26 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func batchHandler(w http.ResponseWriter, req *http.Request) {
-	db := StatbanConfig.Db
-	res, err := db.GetBatchStats()
+	res, err := StatbanConfig.Db.GetBatchStats()
 	if err != nil {
 		internalError(w, "Error when reading batch stats", err)
 		return
 	}
 
-	setHeaders(w)
-	e := json.NewEncoder(w)
-	e.Encode(res)
+	sendResponse(w, res)
 }
 
 func dailyHandler(w http.ResponseWriter, req *http.Request) {
-	db := StatbanConfig.Db
-	res, err := db.GetDailyStats()
+	res, err := StatbanConfig.Db.GetDailyStats()
 	if err != nil {
 		internalError(w, "Error when reading daily stats", err)
 		return
 	}
 
+	sendResponse(w, res)
+}
+
+func sendResponse(w http.ResponseWriter, res interface{}) {
 	setHeaders(w)
 	e := json.NewEncoder(w)
 	e.Encode(res)
