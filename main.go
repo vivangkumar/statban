@@ -93,7 +93,7 @@ func main() {
 	go s.RunCollector(cfg, GithubConfig)
 
 	http.HandleFunc("/", rootHandler)
-	http.HandleFunc("/hourly", hourlyHandler)
+	http.HandleFunc("/batch", batchHandler)
 	http.HandleFunc("/daily", dailyHandler)
 
 	log.Printf("Statban server running on %v", StatbanConfig.HttpAddress)

@@ -10,23 +10,52 @@ import (
 	"time"
 )
 
+var (
+	today    time.Time
+	tomorrow time.Time
+)
+
+func init() {
+	today = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.UTC)
+	tomorrow = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day()+1, 0, 0, 0, 0, time.UTC)
+}
+
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Statban Server"))
 }
 
-func hourlyHandler(w http.ResponseWriter, r *http.Request) {
+func batchHandler(w http.ResponseWriter, req *http.Request) {
+	db := StatbanConfig.Db
+	cur, err := r.DB(db.Name).Table("hourly_summary").Filter(r.Row.Field("created_at").
+		During(today, tomorrow)).Run(db.Session)
+	if err != nil {
+		log.Printf("Error reading batch summary: %v", err.Error())
+		internalError(w, "Read error", err)
+		return
+	}
+	defer cur.Close()
 
+	var res []s.SummarizedBatch
+	err = cur.All(&res)
+	if err != nil {
+		log.Printf("Error when decoding into struct: %v", err.Error())
+		internalError(w, "Decoding error", err)
+		return
+	}
+
+	setHeaders(w)
+	e := json.NewEncoder(w)
+	e.Encode(res)
 }
 
 func dailyHandler(w http.ResponseWriter, req *http.Request) {
-	today := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.UTC)
 	db := StatbanConfig.Db
-
 	cur, err := r.DB(db.Name).Table("daily_summary").Filter(r.Row.Field("beginning").
 		Eq(today)).Run(db.Session)
 	if err != nil {
 		log.Printf("Error reading day summary: %v", err.Error())
+		internalError(w, "Read error", err)
 		return
 	}
 	defer cur.Close()
