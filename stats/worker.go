@@ -28,6 +28,7 @@ func collector(ghConfig *GithubConfig, db *Db) {
 		issues, _, err := ghConfig.Client.Issues.ListByRepo(ghConfig.Owner, ghConfig.TargetRepo, &opt)
 		if err != nil {
 			log.Printf("Github error: %v", err.Error())
+			return
 		}
 
 		if len(issues) > 0 {
@@ -54,7 +55,7 @@ func RunCollector(db *Db, ghConfig *GithubConfig) {
 	for {
 		select {
 		case <-intervalTicker.C:
-			collector(ghConfig, db)
+			go collector(ghConfig, db)
 		case <-dayTicker.C:
 			go db.SummarizeByDay()
 		}
