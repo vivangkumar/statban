@@ -9,7 +9,7 @@ import (
 )
 
 type Config struct {
-	HttpAddress  string
+	Port         string
 	Env          string
 	GithubClient *github.Client
 	Db           *s.Db
@@ -27,9 +27,9 @@ func initialize() {
 	db := s.Db{}
 
 	if addr := os.Getenv("PORT"); addr != "" {
-		c.HttpAddress = addr
+		c.Port = addr
 	} else {
-		c.HttpAddress = "8083"
+		c.Port = ":" + "8083"
 	}
 
 	if env := os.Getenv("ENVIRONMENT"); env != "" {

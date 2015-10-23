@@ -22,6 +22,6 @@ func main() {
 	http.HandleFunc("/hourly", hourlyHandler)
 	http.HandleFunc("/daily", dailyHandler)
 
-	log.Printf("Statban server running on %v", StatbanConfig.HttpAddress)
-	http.ListenAndServe(":"+StatbanConfig.HttpAddress, nil)
+	log.Printf("Statban server running on %v", StatbanConfig.Port)
+	http.ListenAndServe(StatbanConfig.Port, nil)
 }
