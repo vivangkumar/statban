@@ -12,23 +12,6 @@ type Db struct {
 	Session *r.Session
 }
 
-var (
-	today    time.Time
-	tomorrow time.Time
-	thisHour time.Time
-	nextHour time.Time
-)
-
-func init() {
-	now := time.Now().UTC()
-	year, month, day := now.Year(), now.Month(), now.Day()
-
-	today = time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
-	tomorrow = today.Add(time.Duration(24) * time.Hour)
-	thisHour = time.Date(year, month, day, now.Hour(), 0, 0, 0, time.UTC)
-	nextHour = thisHour.Add(time.Duration(1) * time.Hour)
-}
-
 func (d *Db) Setup() (*Db, error) {
 	db := d.Name
 	tables := []string{"hourly_state", "daily_summary", "hourly_summary"}
@@ -69,6 +52,11 @@ func (d *Db) StoreHourlyState(issues []*StatbanIssue) {
 }
 
 func (d *Db) SummarizeByHour(ghConfig *GithubConfig) {
+	now := time.Now().UTC()
+	year, month, day := now.Year(), now.Month(), now.Day()
+	thisHour := time.Date(year, month, day, now.Hour(), 0, 0, 0, time.UTC)
+	nextHour := thisHour.Add(time.Duration(1) * time.Hour)
+
 	log.Printf("Summarizing by hour between %v and %v", thisHour, nextHour)
 
 	cur, err := r.DB(d.Name).Table("hourly_state").Filter(r.Row.Field("created_at").
@@ -110,6 +98,11 @@ func (d *Db) SummarizeByHour(ghConfig *GithubConfig) {
 }
 
 func (d *Db) SummarizeByDay() {
+	now := time.Now().UTC()
+	year, month, day := now.Year(), now.Month(), now.Day()
+	today := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+	tomorrow := today.Add(time.Duration(24) * time.Hour)
+
 	log.Printf("Summarizing by day between %v and %v", today, tomorrow)
 
 	cur, err := r.DB(d.Name).Table("hourly_summary").Filter(r.Row.Field("created_at").
@@ -133,6 +126,10 @@ func (d *Db) SummarizeByDay() {
 }
 
 func (d *Db) GetDailyStats() (res []SummarizedDay, err error) {
+	now := time.Now().UTC()
+	year, month, day := now.Year(), now.Month(), now.Day()
+	today := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+
 	cur, err := r.DB(d.Name).Table("daily_summary").Filter(r.Row.Field("beginning").
 		Eq(today)).Run(d.Session)
 	if err != nil {
@@ -151,6 +148,11 @@ func (d *Db) GetDailyStats() (res []SummarizedDay, err error) {
 }
 
 func (d *Db) GetHourlyStats() (res []SummarizedHour, err error) {
+	now := time.Now().UTC()
+	year, month, day := now.Year(), now.Month(), now.Day()
+	today := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
+	tomorrow := today.Add(time.Duration(24) * time.Hour)
+
 	cur, err := r.DB(d.Name).Table("hourly_summary").Filter(r.Row.Field("created_at").
 		During(today, tomorrow)).Run(d.Session)
 	if err != nil {
