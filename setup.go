@@ -26,8 +26,8 @@ func initialize() {
 	ghConfig := s.GithubConfig{}
 	db := s.Db{}
 
-	if addr := os.Getenv("PORT"); addr != "" {
-		c.Port = addr
+	if port := os.Getenv("PORT"); port != "" {
+		c.Port = ":" + port
 	} else {
 		c.Port = ":" + "8083"
 	}
