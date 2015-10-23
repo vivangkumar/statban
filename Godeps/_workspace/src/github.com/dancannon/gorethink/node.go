@@ -5,7 +5,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	p "github.com/statban/Godeps/_workspace/src/github.com/dancannon/gorethink/ql2"
+	p "github.com/dancannon/gorethink/ql2"
 )
 
 const (

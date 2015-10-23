@@ -7,7 +7,7 @@ import (
 	"io"
 	"strings"
 
-	p "github.com/statban/Godeps/_workspace/src/github.com/dancannon/gorethink/ql2"
+	p "github.com/dancannon/gorethink/ql2"
 )
 
 // Write 'data' to conn
