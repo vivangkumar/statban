@@ -9,3 +9,7 @@ wget -qO- http://download.rethinkdb.com/apt/pubkey.gpg | sudo apt-key add -
 
 sudo apt-get update
 sudo apt-get install rethinkdb
+
+# Setup with init.d
+sudo cp /etc/rethinkdb/default.conf.sample /etc/rethinkdb/instances.d/instance1.conf
+sudo /etc/init.d/rethinkdb restart
