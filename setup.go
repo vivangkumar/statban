@@ -26,10 +26,10 @@ func initialize() {
 	ghConfig := s.GithubConfig{}
 	db := s.Db{}
 
-	if addr := os.Getenv("HTTP_ADDR"); addr != "" {
+	if addr := os.Getenv("PORT"); addr != "" {
 		c.HttpAddress = addr
 	} else {
-		c.HttpAddress = "localhost:8083"
+		c.HttpAddress = "8083"
 	}
 
 	if env := os.Getenv("ENVIRONMENT"); env != "" {

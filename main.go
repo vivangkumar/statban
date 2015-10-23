@@ -23,5 +23,5 @@ func main() {
 	http.HandleFunc("/daily", dailyHandler)
 
 	log.Printf("Statban server running on %v", StatbanConfig.HttpAddress)
-	http.ListenAndServe(StatbanConfig.HttpAddress, nil)
+	http.ListenAndServe(":"+StatbanConfig.HttpAddress, nil)
 }
