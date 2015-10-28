@@ -25,7 +25,7 @@ type SummarizedHour struct {
 type SummarizedDay struct {
 	*SummarizedHour
 	DayStart time.Time `gorethink:"day_start,omitempty" json:"day_start"`
-	DayEnd   time.Time `gorethink:"day_start,omitempty" json:"day_end"`
+	DayEnd   time.Time `gorethink:"day_end,omitempty" json:"day_end"`
 }
 
 type SummarizedState map[string]int
