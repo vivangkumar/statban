@@ -130,8 +130,8 @@ func (d *Db) GetDailyStats() (res []SummarizedDay, err error) {
 	year, month, day := now.Year(), now.Month(), now.Day()
 	today := time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 
-	cur, err := r.DB(d.Name).Table("daily_summary").Filter(r.Row.Field("beginning").
-		Eq(today)).Run(d.Session)
+	cur, err := r.DB(d.Name).Table("daily_summary").Filter(r.Row.Field("created_at").
+		Gt(today)).Run(d.Session)
 	if err != nil {
 		log.Printf("Error reading day summary: %v", err.Error())
 		return nil, err
