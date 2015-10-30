@@ -18,8 +18,8 @@ type StatbanIssue struct {
 type SummarizedHour struct {
 	States    *[]SummarizedState `gorethink:"states,omitempty" json:"states"`
 	CreatedAt time.Time          `gorethink:"created_at,omitmepty" json:"created_at"`
-	HourStart time.Time          `gorethink:"hour_start,omitempty json:"hour_start"`
-	HourEnd   time.Time          `gorethink:"hour_end,omitempty json:"hour_end"`
+	HourStart time.Time          `gorethink:"hour_start,omitempty" json:"hour_start"`
+	HourEnd   time.Time          `gorethink:"hour_end,omitempty" json:"hour_end"`
 }
 
 type SummarizedDay struct {
