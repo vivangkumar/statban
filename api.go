@@ -1,59 +1,55 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 )
 
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Statban Server"))
+func rootHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"Statban": "API"})
 }
 
-func hourlyHandler(w http.ResponseWriter, req *http.Request) {
+func hourlyHandler(c *gin.Context) {
 	res, err := StatbanConfig.Db.GetHourlyStats()
 	if err != nil {
-		internalError(w, "Error when reading hourly stats", err)
+		internalError(c, "Error when reading hourly stats", err)
 		return
 	}
 
-	sendResponse(w, res)
+	sendResponse(c, res)
 }
 
-func dailyHandler(w http.ResponseWriter, req *http.Request) {
+func dailyHandler(c *gin.Context) {
 	res, err := StatbanConfig.Db.GetDailyStats()
 	if err != nil {
-		internalError(w, "Error when reading daily stats", err)
+		internalError(c, "Error when reading daily stats", err)
 		return
 	}
 
-	sendResponse(w, res)
+	sendResponse(c, res)
 }
 
-func sendResponse(w http.ResponseWriter, res interface{}) {
-	setHeaders(w)
-	e := json.NewEncoder(w)
-	e.Encode(res)
+func sendResponse(c *gin.Context, res interface{}) {
+	setHeaders(c)
+	c.JSON(http.StatusOK, res)
 }
 
-func setHeaders(w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+func setHeaders(c *gin.Context) {
+	c.Writer.Header().Set("Content-Type", "application/json")
 }
 
-func fail(w http.ResponseWriter, status int, msg string, err error) {
-	w.WriteHeader(status)
+func fail(c *gin.Context, status int, msg string, err error) {
 	err = fmt.Errorf("%s: %s", msg, err.Error())
 	log.Printf(err.Error())
-	w.Write([]byte(err.Error()))
+	c.JSON(status, gin.H{"error": err.Error()})
 }
 
-func internalError(w http.ResponseWriter, msg string, err error) {
-	fail(w, http.StatusInternalServerError, msg, err)
+func internalError(c *gin.Context, msg string, err error) {
+	fail(c, http.StatusInternalServerError, msg, err)
 }
 
-func clientError(w http.ResponseWriter, msg string, err error) {
-	fail(w, http.StatusBadRequest, msg, err)
+func clientError(c *gin.Context, msg string, err error) {
+	fail(c, http.StatusBadRequest, msg, err)
 }

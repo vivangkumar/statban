@@ -120,9 +120,13 @@ func (d *Db) SummarizeByDay() {
 		return
 	}
 
-	sb := &res[len(res)-1]
-	d.writeDailySummary(NewSummarizedDay(sb, today, tomorrow))
-	return
+	if len(res) > 1 {
+		sb := &res[len(res)-1]
+		d.writeDailySummary(NewSummarizedDay(sb, today, tomorrow))
+		return
+	} else {
+		log.Printf("No hourly summaries to summarize by day")
+	}
 }
 
 func (d *Db) GetDailyStats() (res []SummarizedDay, err error) {

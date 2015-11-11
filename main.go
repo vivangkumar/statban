@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
 	s "github.com/vivangkumar/statban/stats"
 	"log"
-	"net/http"
 )
 
 func init() {
@@ -18,10 +18,12 @@ func main() {
 
 	go s.RunCollector(cfg, GithubConfig)
 
-	http.HandleFunc("/", rootHandler)
-	http.HandleFunc("/hourly", hourlyHandler)
-	http.HandleFunc("/daily", dailyHandler)
+	router := gin.Default()
+
+	router.GET("/", rootHandler)
+	router.GET("/hourly", hourlyHandler)
+	router.GET("/daily", dailyHandler)
 
 	log.Printf("Statban server running on %v", StatbanConfig.Port)
-	http.ListenAndServe(StatbanConfig.Port, nil)
+	router.Run(StatbanConfig.Port)
 }
