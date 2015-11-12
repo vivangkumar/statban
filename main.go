@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	s "github.com/vivangkumar/statban/stats"
-	"log"
 )
 
 func init() {
@@ -19,11 +18,13 @@ func main() {
 	go s.RunCollector(cfg, GithubConfig)
 
 	router := gin.Default()
+	router.LoadHTMLGlob("public/*")
 
 	router.GET("/", rootHandler)
 	router.GET("/hourly", hourlyHandler)
 	router.GET("/daily", dailyHandler)
 
-	log.Printf("Statban server running on %v", StatbanConfig.Port)
+	router.GET("/graphs", graphHandler)
+
 	router.Run(StatbanConfig.Port)
 }

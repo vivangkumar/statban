@@ -1,0 +1,77 @@
+<html>
+  <head>
+    <title>{{ .title }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.8/d3.min.js">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.8/d3.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.js"></script>
+  </head>
+  <body>
+    <div id="cfd-graph">
+    </div>
+  </body>
+
+  <script>
+    function convertData() {
+      var formatted = {
+        columns: [],
+        groups: []
+      };
+      var agg = {
+        ready: [],
+        development: [],
+        review: [],
+        release: [],
+        done: []
+      };
+      var x = ['x'];
+
+      var data = JSON.parse("{{ .data }}");
+      for(var i = 0, l = data.length; i < l; i++) {
+        var reqData = data[i].states;
+        for(var k = 0, l1 = reqData.length; k < l1; k++) {
+          for(var key in reqData[k]) {
+            if(agg[key]) {
+              agg[key].push(reqData[k][key]);
+            }
+
+            x.push(Date.parse(data[i].day_start));
+          }
+        }
+      }
+
+      formatted.columns.push(_.uniq(x, false));
+      for(var key in agg) {
+        var pushKey = [key];
+        for(var i = 0, l = agg[key].length; i < l; i++) {
+          pushKey.push(agg[key][i])
+        }
+        formatted.columns.push(pushKey);
+      }
+
+      return formatted;
+    }
+
+    var fData = convertData();
+    var chart = c3.generate({
+      bindto: '#cfd-graph',
+      data: {
+        x: 'x',
+        columns: fData.columns,
+        type: 'bar',
+        groups: [['ready', 'development', 'review', 'release', 'done']]
+      },
+      axis: {
+        x: {
+          type: 'timeseries',
+          tick: {
+            format: '%Y-%m-%d'
+          }
+        }
+      }
+    })
+  </script>
+</html>

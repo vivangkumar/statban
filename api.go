@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -29,6 +30,20 @@ func dailyHandler(c *gin.Context) {
 	}
 
 	sendResponse(c, res)
+}
+
+func graphHandler(c *gin.Context) {
+	res, err := StatbanConfig.Db.GetDailyStats()
+	if err != nil {
+		internalError(c, "Error when reading daily stats", err)
+		return
+	}
+
+	data, _ := json.Marshal(res)
+	c.HTML(http.StatusOK, "graph.tmpl", gin.H{
+		"title": "Kanban graph",
+		"data":  string(data),
+	})
 }
 
 func sendResponse(c *gin.Context, res interface{}) {
