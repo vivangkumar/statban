@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func rootHandler(c *gin.Context) {
@@ -23,7 +24,9 @@ func hourlyHandler(c *gin.Context) {
 }
 
 func dailyHandler(c *gin.Context) {
-	res, err := StatbanConfig.Db.GetDailyStats()
+	limit := c.DefaultQuery("days", "30")
+	dayLimit, _ := strconv.Atoi(limit)
+	res, err := StatbanConfig.Db.GetDailyStats(dayLimit)
 	if err != nil {
 		internalError(c, "Error when reading daily stats", err)
 		return
@@ -33,7 +36,9 @@ func dailyHandler(c *gin.Context) {
 }
 
 func graphHandler(c *gin.Context) {
-	res, err := StatbanConfig.Db.GetDailyStats()
+	limit := c.DefaultQuery("days", "30")
+	dayLimit, _ := strconv.Atoi(limit)
+	res, err := StatbanConfig.Db.GetDailyStats(dayLimit)
 	if err != nil {
 		internalError(c, "Error when reading daily stats", err)
 		return

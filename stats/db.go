@@ -129,8 +129,8 @@ func (d *Db) SummarizeByDay() {
 	}
 }
 
-func (d *Db) GetDailyStats() (res []SummarizedDay, err error) {
-	cur, err := r.DB(d.Name).Table("daily_summary").Limit(30).Run(d.Session)
+func (d *Db) GetDailyStats(limit int) (res []SummarizedDay, err error) {
+	cur, err := r.DB(d.Name).Table("daily_summary").Limit(limit).Run(d.Session)
 	if err != nil {
 		log.Printf("Error reading day summary: %v", err.Error())
 		return nil, err
