@@ -42,3 +42,7 @@ To build, use `go build`
 
 This should build you an executable, which you can run using `./statban`
 
+## Graph
+
+There is also a stacked area graph visualising issues in various stages. This can be accessed from the `/graphs` endpoint. You can also tune the number of days you wish to see the graph for by specifiying the `days` query parameter.
+
